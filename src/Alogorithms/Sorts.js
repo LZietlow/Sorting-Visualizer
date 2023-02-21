@@ -3,7 +3,10 @@ const isSorting = false;
 let selectedSort = "";
 
 const COMPARE_TWO_BARS_COLOR = "purple";
-const BAR_COLOR = "blue";
+const BAR_COLOR = "#003399";
+const FINISHED_COLOR = "green" 
+
+const ANIMATION_SPEED_MS = 6;
 
 export function setSort(sort) {
     selectedSort = sort;
@@ -14,15 +17,15 @@ export function startSorting(array) {
         switch(selectedSort) {
             case "Bubble": bubbleSort(array);
             break;
-            case "Quick": quickSort(array);
+            case "Quick": quickSort(array, 0, array.length-1);
             break;
-            case "Selection": selectedSort(array);
+            case "Selection": selectionSort(array);
             break;
-            case "Merge": mergeSort(array);
+            case "Merge": mergeSort(array, getBars());
+            break;
             default : throw new Error("Something went wrong");
         }
     }
-    
 }
 
 
@@ -38,9 +41,7 @@ async function bubbleSort(array) {
     let bars = getBars();
     for(let i = 0; i < array.length; i++) {
         for(let j = 0; j < array.length-i-1; j++) {
-            bars[j+1].style.backgroundColor = COMPARE_TWO_BARS_COLOR;
-            bars[j].style.backgroundColor = COMPARE_TWO_BARS_COLOR;
-            await sleep(2);
+            await sleep(ANIMATION_SPEED_MS);
             if(array[j+1] < array[j]) {
                 let height = bars[j+1].style.height;
 
@@ -56,21 +57,25 @@ async function bubbleSort(array) {
                 bars[j].style.backgroundColor = BAR_COLOR;
             }  
         }
-        bars[array.length-i-1].style.backgroundColor = "green";
+        bars[array.length-i-1].style.backgroundColor = FINISHED_COLOR;
     }
 }
 
 
 async function quickSort(array, lo, hi) {
-     //let bars = getBars();
+    let bars = getBars();
     if(lo < hi) {
-        let p = await partition(array, lo, hi);
+        let p = await partition(array, lo, hi, bars);
         await quickSort(array, lo, p);
         await quickSort(array, p+1, hi);
+
+        for (let i = lo; i <= hi; i++) {
+            bars[i].style.backgroundColor = FINISHED_COLOR;
+          }
     }
 }
 
-async function partition(array, lo, hi) {
+async function partition(array, lo, hi, bars) {
     let pivotPos = Math.floor(((hi+lo)/2));
     let pivot = array[pivotPos];
     let i = lo-1;
@@ -81,44 +86,42 @@ async function partition(array, lo, hi) {
             if(i>hi) {
                 break;
             }
-            //await sleep(10)
+            await sleep(ANIMATION_SPEED_MS)
         }while(array[i] < pivot);
         do{
             j = j-1;
             if(j<0){
                 break;
             }
-            //await sleep(10)
+            await sleep(ANIMATION_SPEED_MS)
         }while (array[j] > pivot);
         if(i >= j) {
+           
             return j;
         }
-        await swap(array, i, j);
-        //await sleep(10);
-        //bars[i].style.backgroundColor = "blue";
-        //bars[j].style.backgroundColor = "blue";
+        await swap(array, i, j, bars);
+        await sleep(ANIMATION_SPEED_MS);
     }
 }
 
 async function selectionSort(array) {
-    //let bars = getBars();
+    let bars = getBars();
     for (let i = 0; i < array.length-1; i++) {
 
         let min = i;
-
         for (let j = i+1; j < array.length; j++) {
             if(array[j] < array[min]){
                 min = j;
+                await sleep(ANIMATION_SPEED_MS);
             }
         }
         if(min !== i){
-            await swap(array, i, min);
-            //await sleep(30);
-            //bars[min].style.backgroundColor = "blue";
+            await swap(array, i, min, bars);
+            await sleep(ANIMATION_SPEED_MS);
         }
-        //bars[i].style.backgroundColor = "green";
+        bars[i].style.backgroundColor = FINISHED_COLOR;
     }
-    //bars[array.length-1].style.backgroundColor = "green";
+    bars[array.length-1].style.backgroundColor = FINISHED_COLOR;
 }
 
 async function swap(array, i, min, bars) {
@@ -126,57 +129,68 @@ async function swap(array, i, min, bars) {
     array[i] = array[min];
     array[min] = tmp;
 
-    //bars[i].style.backgroundColor = "#42beeb";
-    //bars[min].style.backgroundColor = "#42beeb";
-
-    //let height = bars[i].style.height;
-    //bars[i].style.height = bars[min].style.height;
-    //bars[min].style.height = height;
+    let height = bars[i].style.height;
+    bars[i].style.height = bars[min].style.height;
+    bars[min].style.height = height;
 
 }
 
-async function mergeSort(array) {
-    //let bars = getBars();
+async function mergeSort(array, bars) {
     if(array.length > 1) {
+        let barsL =[];
+        let barsR = [];
         let l = [];
         let r = [];
         let mid = Math.floor((array.length-1)/2);
         for (let i = 0; i < mid+1; i++) {
             l.push(array[i]);
+            barsL.push(bars[i]);
         }
         for (let i = mid+1; i < array.length; i++) {
             r.push(array[i]);
+            barsR.push(array[i]);
         }
-        l = await mergeSort(l);
-        r = await mergeSort(r);
+        l = await mergeSort(l,barsL);
+        r = await mergeSort(r, barsR);
 
-        await merge(array, l, r);
+
+        await merge(l, r, barsL, barsR);
     }
     return array;
 }
 
-async function merge(array, left, right) {
+async function merge(left, right, barsL, barsR) {
 
+    let toReturn = [];
+    let returnBars = [];
     let countL = 0;
     let countR = 0;
     let k = 0;
 
-    let length = left.length + right.length;
-    for (let i = 0; i < length; i++) {
-        //bars[countL].style.backgroundColor = "red";
-        //bars[countR].style.backgroundColor = "red";
-        //await sleep(10);
-        if(left[countL] < right[countR] || right[countR] === undefined) {
+    while (countL < left.length && countR < right.length) {
+        await sleep(ANIMATION_SPEED_MS);
+
+        if (left[countL] < right[countR]) {
             array[k++] = left[countL++];
-            //let height = bars[k-1].style.height;
-            //bars[k-1].style.height = bars[countL].style.height;
-            //bars[countL].style.height = height;
         } else {
             array[k++] = right[countR++];
-            //let test = bars[k-1].style.height;
-            //bars[k-1].style.height = bars[countL].style.height;
-            //bars[countR].style.height = test;
         }
+
+        bars[k - 1].style.height = array[k - 1] + "px";
+        //bars[k - 1].style.backgroundColor = FINISHED_COLOR;
+    }
+
+    while (countL < left.length) {
+        await sleep(ANIMATION_SPEED_MS);
+        array[k++] = left[countL++];
+        bars[k - 1].style.height = array[k - 1] + "px";
+        //bars[k - 1].style.backgroundColor = FINISHED_COLOR;
+    }
+
+    while (countR < right.length) {
+        array[k++] = right[countR++];
+        bars[k - 1].style.height = array[k - 1] + "px";
+        //bars[k - 1].style.backgroundColor = FINISHED_COLOR;
     }
 
 }

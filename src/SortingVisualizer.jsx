@@ -4,10 +4,7 @@ import ControllBar from "./components/ControllBar";
 
 const ANIMATION_SPEED_MS = 1;
 
-const BAR_COLOR = "blue";
-
-const COMPARE_COLOR = "red";
-
+const BAR_COLOR = "#003399";
 
 
 export default function SortingVisualizer() {
