@@ -135,64 +135,66 @@ async function swap(array, i, min, bars) {
 
 }
 
-async function mergeSort(array, bars) {
-    if(array.length > 1) {
-        let barsL =[];
-        let barsR = [];
-        let l = [];
-        let r = [];
-        let mid = Math.floor((array.length-1)/2);
-        for (let i = 0; i < mid+1; i++) {
-            l.push(array[i]);
-            barsL.push(bars[i]);
-        }
-        for (let i = mid+1; i < array.length; i++) {
-            r.push(array[i]);
-            barsR.push(array[i]);
-        }
-        l = await mergeSort(l,barsL);
-        r = await mergeSort(r, barsR);
-
-
-        await merge(l, r, barsL, barsR);
+async function mergeSort(array) {
+    let bars = getBars();
+    if (array.length < 2) {
+        return array;
     }
-    return array;
+    const middle = Math.floor(array.length / 2);
+    const left = array.slice(0, middle);
+    const right = array.slice(middle);
+    await mergeSort(left);
+    await mergeSort(right);
+
+    await merge(array, left, right, bars);
+
+    for (let k = 0; k < left.length + right.length; k++) {
+        bars[k].style.backgroundColor = FINISHED_COLOR;
+    }
 }
 
-async function merge(left, right, barsL, barsR) {
 
-    let toReturn = [];
-    let returnBars = [];
-    let countL = 0;
-    let countR = 0;
+async function merge(array, left, right, bars) {
+    
+    let i = 0;
+    let j = 0;
     let k = 0;
 
-    while (countL < left.length && countR < right.length) {
-        await sleep(ANIMATION_SPEED_MS);
-
-        if (left[countL] < right[countR]) {
-            array[k++] = left[countL++];
+    while (i < left.length && j < right.length) {
+        if (left[i] < right[j]) {
+            array[k] = left[i];
+            i++;
         } else {
-            array[k++] = right[countR++];
+            array[k] = right[j];
+            j++;
         }
-
-        bars[k - 1].style.height = array[k - 1] + "px";
-        //bars[k - 1].style.backgroundColor = FINISHED_COLOR;
-    }
-
-    while (countL < left.length) {
+        bars[k].style.height = array[k] + "px";
+        bars[k].style.backgroundColor = BAR_COLOR;
+        if (k + array.length < bars.length) {
+            bars[k + array.length].style.height = array[k] + "px";
+            bars[k + array.length].style.backgroundColor = BAR_COLOR;
+        }
         await sleep(ANIMATION_SPEED_MS);
-        array[k++] = left[countL++];
-        bars[k - 1].style.height = array[k - 1] + "px";
-        //bars[k - 1].style.backgroundColor = FINISHED_COLOR;
+        k++;
     }
 
-    while (countR < right.length) {
-        array[k++] = right[countR++];
-        bars[k - 1].style.height = array[k - 1] + "px";
-        //bars[k - 1].style.backgroundColor = FINISHED_COLOR;
+    while (i < left.length) {
+        array[k] = left[i];
+        bars[k].style.height = array[k] + "px";
+        bars[k].style.backgroundColor = BAR_COLOR;
+        await sleep(ANIMATION_SPEED_MS);
+        i++;
+        k++;
     }
 
+    while (j < right.length) {
+        array[k] = right[j];
+        bars[k].style.height = array[k] + "px";
+        bars[k].style.backgroundColor = BAR_COLOR;
+        await sleep(ANIMATION_SPEED_MS);
+        j++;
+        k++;
+    }
 }
 
 function sleep(ms) {

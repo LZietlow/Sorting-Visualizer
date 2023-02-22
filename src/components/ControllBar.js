@@ -8,24 +8,29 @@ import { setSort, startSorting} from '../Alogorithms/Sorts';
 
 export default function ControllBar({resetArray, array, printArray, sliderValue, setSliderValue}) {
 
+    const[activeButtonId, setActiveButtonId] = useState(null);
+
     function changeSliderValue(event) {
-        setSliderValue(event.target.value);  
+        setSliderValue(event.target.value);
+        resetArray();  
     }
 
     function handleClick(event) {
-        setSort(event.target.id);
-        console.log(event.target.id);
+        const id = event.target.id;
+        setSort(id);
+        setActiveButtonId(id);
     }
 
     return (
         <div className='components-box'>
-            <Button id="test123" onClick={resetArray} text="Generate new Array"/>
-            <Slider id="test123" onChange={changeSliderValue} text="Array Size" type="range" min="4" max="100" value={sliderValue}/>
-            <Button id="Bubble" onClick={handleClick} text="BubbleSort"/>
-            <Button id="Quick" onClick={handleClick} text="QuickSort"/>
-            <Button id="Selection" onClick={handleClick} text="SelectionSort"/>
-            <Button id="Merge" onClick={handleClick} text="MergeSort"/>
-            <Button id="test123" onClick={() => startSorting(array)} text="Sort!"/>
+            <Button onClick={resetArray} text="Generate new Array" />
+            <Slider id='slider' onChange={changeSliderValue} text="Array Size" type="range" min="4" max="250" value={sliderValue}/>
+            <Button id="Bubble" onClick={handleClick} text="BubbleSort" className={activeButtonId}/>
+            <Button id="Quick" onClick={handleClick} text="QuickSort" className={activeButtonId}/>
+            <Button id="Selection" onClick={handleClick} text="SelectionSort" className={activeButtonId}/>
+            <Button id="Merge" onClick={handleClick} text="MergeSort" className={activeButtonId}/>
+            <Button id="test123" onClick={() => startSorting(array)} text="Sort!" className='tool-button'/>
+            <Button onClick={printArray} text="print Array"></Button>
         </div>
     
     )
