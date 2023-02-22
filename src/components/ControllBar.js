@@ -30,7 +30,6 @@ export default function ControllBar({resetArray, array, printArray, sliderValue,
             <Button id="Selection" onClick={handleClick} text="SelectionSort" className={activeButtonId}/>
             <Button id="Merge" onClick={handleClick} text="MergeSort" className={activeButtonId}/>
             <Button id="test123" onClick={() => startSorting(array)} text="Sort!" className='tool-button'/>
-            <Button onClick={printArray} text="print Array"></Button>
         </div>
     
     )

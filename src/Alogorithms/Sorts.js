@@ -137,20 +137,20 @@ async function swap(array, i, min, bars) {
 
 async function mergeSort(array) {
     let bars = getBars();
-    if (array.length < 2) {
-        return array;
-    }
-    const middle = Math.floor(array.length / 2);
-    const left = array.slice(0, middle);
-    const right = array.slice(middle);
-    await mergeSort(left);
-    await mergeSort(right);
+    if (array.length > 1) {
+        const middle = Math.floor(array.length / 2);
+        const left = array.slice(0, middle);
+        const right = array.slice(middle);
+        await mergeSort(left);
+        await mergeSort(right);
 
-    await merge(array, left, right, bars);
+        await merge(array, left, right, bars);
 
-    for (let k = 0; k < left.length + right.length; k++) {
+        for (let k = 0; k < left.length + right.length; k++) {
         bars[k].style.backgroundColor = FINISHED_COLOR;
+        }
     }
+    
 }
 
 
