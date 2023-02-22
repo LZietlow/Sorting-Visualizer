@@ -1,8 +1,7 @@
 
-const isSorting = false;
+
 let selectedSort = "";
 
-const COMPARE_TWO_BARS_COLOR = "purple";
 const BAR_COLOR = "#003399";
 const FINISHED_COLOR = "green" 
 
@@ -12,20 +11,20 @@ export function setSort(sort) {
     selectedSort = sort;
 }
 
-export function startSorting(array) {
-    if(!isSorting) {
-        switch(selectedSort) {
-            case "Bubble": bubbleSort(array);
-            break;
-            case "Quick": quickSort(array, 0, array.length-1);
-            break;
-            case "Selection": selectionSort(array);
-            break;
-            case "Merge": mergeSort(array, getBars());
-            break;
-            default : throw new Error("Something went wrong");
-        }
+export async function startSorting(array, setIsSorting) {
+   switch(selectedSort) {
+        case "Bubble": await bubbleSort(array);
+        break;
+        case "Quick": await quickSort(array, 0, array.length-1);
+        break;
+        case "Selection": await selectionSort(array);
+        break;
+        case "Merge": await mergeSort(array, getBars());
+        break;
+        default : throw new Error("Something went wrong");
     }
+    setIsSorting();
+    
 }
 
 
